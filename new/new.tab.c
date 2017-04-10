@@ -75,10 +75,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct
+typedef struct datas
 {
 	char *name, *val;
-	struct pro * next;
+	struct datas * next;
 }Prop;
 typedef struct
 {

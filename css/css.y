@@ -4,16 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct pro
+typedef struct
 {
 	char *name, *val;
 	struct pro * next;
-}data1;
-typedef struct label
-{
-	char * name;
-	data1 * hd;
-}data2;
+}Prop;
 
 %}
 %token NAME VALUE

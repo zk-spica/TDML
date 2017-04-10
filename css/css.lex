@@ -1,3 +1,8 @@
+/*
+	0: LABEL
+	1: CLASS
+	2: ID
+*/
 %{
 #include "main.h"
 #include "css.tab.h"
@@ -7,10 +12,20 @@ extern char * yylval;
 
 
 %% 
- 
+
 [a-zA-Z_][-a-zA-Z0-9_]* {
 	yylval = strdup(yytext);
-	return NAME;
+	return LABEL;
+}
+
+[.][a-zA-Z_][-a-zA-Z0-9_]* {
+	yylval = strdup(yytext);
+	return CLASS;
+}
+
+[#][a-zA-Z_][-a-zA-Z0-9_]* {
+	yylval = strdup(yytext);
+	return CLASS;
 }
 
 :[^;]+[;] {
