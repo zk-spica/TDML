@@ -75,16 +75,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct pro
+typedef struct
 {
 	char *name, *val;
 	struct pro * next;
-}data1;
-typedef struct label
+}Prop;
+typedef struct
 {
 	char * name;
-	data1 * hd;
-}data2;
+	Prop * hd;
+}Label;
 
 
 
@@ -1336,7 +1336,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 29 "new.y"
     {
-		getlabel((data2 *)(yyvsp[(2) - (3)]), 0);
+		getlabel((Label *)(yyvsp[(2) - (3)]), 0);
 	;}
     break;
 
@@ -1345,7 +1345,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 32 "new.y"
     {
-		getlabel((data2 *)(yyvsp[(2) - (4)]), 1);
+		getlabel((Label *)(yyvsp[(2) - (4)]), 1);
 	;}
     break;
 
@@ -1363,11 +1363,11 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 41 "new.y"
     {
-		data2 * tmp1 = (data2 *)(yyvsp[(1) - (2)]);
-		data1 * tmp2 = (data1 *)(yyvsp[(2) - (2)]);
+		Label * tmp1 = (Label *)(yyvsp[(1) - (2)]);
+		Prop * tmp2 = (Prop *)(yyvsp[(2) - (2)]);
 		tmp2->next = tmp1->hd;
 		tmp1->hd = tmp2;
-		//printf("label property: %s %s\n",tmp2->name,tmp2->val);
+		//printf("label Property: %s %s\n",tmp2->name,tmp2->val);
 		(yyval) = (char *)tmp1;
 	;}
     break;
@@ -1377,7 +1377,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 49 "new.y"
     {
-	data2 * tmp = (data2 *)malloc(sizeof(data2));
+	Label * tmp = (Label *)malloc(sizeof(Label));
 	tmp->name = (yyvsp[(1) - (1)]); tmp->hd = NULL;
 	(yyval) = (char *)tmp;
 ;}
@@ -1388,7 +1388,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 58 "new.y"
     {
-		data1 * tmp = (data1 *)malloc(sizeof(data1));
+		Prop * tmp = (Prop *)malloc(sizeof(Prop));
 		//printf("%d",strlen($3));
 		//tmp->name = (char *)malloc(sizeof(char)*(1+strlen($1))); memcpy(tmp->name, $1, strlen($1)+1);
 		//tmp->val = (char *)malloc(sizeof(char)*(1+strlen($3))); memcpy(tmp->val, $3, strlen($3)+1);
@@ -1629,10 +1629,10 @@ int yyerror(char *s)
     return 0;  
 }
 
-void getlabel(data2* s,int flag)
+void getlabel(Label* s,int flag)
 {
 	printf("getlabel: %s %d\n" ,s->name ,flag);
-	data1* tmp = s->hd;
+	Prop* tmp = s->hd;
 	while (tmp!=NULL)
 	{
 		printf("%s=%s\n", tmp->name, tmp->val);
