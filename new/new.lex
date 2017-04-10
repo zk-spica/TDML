@@ -2,6 +2,7 @@
 #include "main.h"
 #include "new.tab.h"
 #include <stdio.h>
+#include <string.h>
 extern char * yylval;
 %}  
 

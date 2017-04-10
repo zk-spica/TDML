@@ -17,8 +17,26 @@ typedef struct data2
 	Prop * hd;
 }Label;
 
-
 #include "labelHandler.c"
+
+void getlabel(Label* s,int flag)
+{
+	printf("getlabel: %s %d\n" ,s->name ,flag);
+	Prop* tmp = s->hd;
+	while (tmp!=NULL)
+	{
+		printf("%s=%s\n", tmp->name, tmp->val);
+		tmp = tmp->next;
+	}
+	printf("\n");
+	onGetStartingLabel(s, flag);
+}
+
+void finishlabel(char * name)
+{
+	printf("%s finished\n" ,name);
+	onGetEndingLabel(name);
+}
 
 %}
 %token NAME VALUE
@@ -83,23 +101,4 @@ int yyerror(char *s)
 {  
     printf("error: %s\n",s);  
     return 0;  
-}
-
-void getlabel(Label* s,int flag)
-{
-	printf("getlabel: %s %d\n" ,s->name ,flag);
-	Prop* tmp = s->hd;
-	while (tmp!=NULL)
-	{
-		printf("%s=%s\n", tmp->name, tmp->val);
-		tmp = tmp->next;
-	}
-	printf("\n");
-	onGetStartingLabel(s, flag);
-}
-
-void finishlabel(char * name)
-{
-	printf("%s finished\n" ,name);
-	onGetEndingLabel(name);
 }
