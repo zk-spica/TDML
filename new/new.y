@@ -4,16 +4,21 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct datas
+
+typedef struct data1
 {
 	char *name, *val;
-	struct datas * next;
+	struct data1 * next;
 }Prop;
-typedef struct
+
+typedef struct data2
 {
 	char * name;
 	Prop * hd;
 }Label;
+
+
+#include "labelHandler.c"
 
 %}
 %token NAME VALUE
@@ -90,9 +95,11 @@ void getlabel(Label* s,int flag)
 		tmp = tmp->next;
 	}
 	printf("\n");
+	onGetStartingLabel(s, flag);
 }
 
 void finishlabel(char * name)
 {
 	printf("%s finished\n" ,name);
+	onGetEndingLabel(name);
 }

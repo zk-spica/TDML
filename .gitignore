@@ -14,6 +14,14 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# Windows binaries
+*.exe
+
+# lex & yacc intermediate files
+*.tab.h
+*.tab.c
+*.yy.c
+
 # Windows shortcuts
 *.lnk
 
