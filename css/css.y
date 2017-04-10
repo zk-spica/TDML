@@ -16,7 +16,7 @@ typedef struct data2
 }Namelist;
 
 %}
-%token NAME VALUE
+%token LABEL CLASS ID VALUE
 
 %%
 
