@@ -8,7 +8,7 @@ extern char * yylval;
 
 %% 
  
-[-a-zA-Z_][a-zA-Z0-9_]* {
+[a-zA-Z_][-a-zA-Z0-9_]* {
 	yylval = strdup(yytext);
 	return NAME;
 }

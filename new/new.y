@@ -4,16 +4,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct pro
+typedef struct
 {
 	char *name, *val;
 	struct pro * next;
-}data1;
-typedef struct label
+}Prop;
+typedef struct
 {
 	char * name;
-	data1 * hd;
-}data2;
+	Prop * hd;
+}Label;
 
 %}
 %token NAME VALUE
@@ -27,10 +27,10 @@ S:
 
 comlabel:
 	'<' label '>' {
-		getlabel((data2 *)$2, 0);
+		getlabel((Label *)$2, 0);
 	}
 |	'<' label '/' '>' {
-		getlabel((data2 *)$2, 1);
+		getlabel((Label *)$2, 1);
 	}
 |	'<' '/' NAME '>' {
 		finishlabel($3);
@@ -39,15 +39,15 @@ comlabel:
 
 label:
 	label property {
-		data2 * tmp1 = (data2 *)$1;
-		data1 * tmp2 = (data1 *)$2;
+		Label * tmp1 = (Label *)$1;
+		Prop * tmp2 = (Prop *)$2;
 		tmp2->next = tmp1->hd;
 		tmp1->hd = tmp2;
-		//printf("label property: %s %s\n",tmp2->name,tmp2->val);
+		//printf("label Property: %s %s\n",tmp2->name,tmp2->val);
 		$$ = (char *)tmp1;
 	}
 |	NAME {
-	data2 * tmp = (data2 *)malloc(sizeof(data2));
+	Label * tmp = (Label *)malloc(sizeof(Label));
 	tmp->name = $1; tmp->hd = NULL;
 	$$ = (char *)tmp;
 }
@@ -56,7 +56,7 @@ label:
 
 property:
 	NAME '=' VALUE {
-		data1 * tmp = (data1 *)malloc(sizeof(data1));
+		Prop * tmp = (Prop *)malloc(sizeof(Prop));
 		//printf("%d",strlen($3));
 		//tmp->name = (char *)malloc(sizeof(char)*(1+strlen($1))); memcpy(tmp->name, $1, strlen($1)+1);
 		//tmp->val = (char *)malloc(sizeof(char)*(1+strlen($3))); memcpy(tmp->val, $3, strlen($3)+1);
@@ -80,10 +80,10 @@ int yyerror(char *s)
     return 0;  
 }
 
-void getlabel(data2* s,int flag)
+void getlabel(Label* s,int flag)
 {
 	printf("getlabel: %s %d\n" ,s->name ,flag);
-	data1* tmp = s->hd;
+	Prop* tmp = s->hd;
 	while (tmp!=NULL)
 	{
 		printf("%s=%s\n", tmp->name, tmp->val);
