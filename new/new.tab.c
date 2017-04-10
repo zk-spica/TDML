@@ -75,21 +75,24 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct pro
+typedef struct data1
 {
 	char *name, *val;
-	struct pro * next;
-}data1;
-typedef struct label
+	struct data1 * next;
+}Prop;
+
+typedef struct data2
 {
 	char * name;
-	data1 * hd;
-}data2;
+	Prop * hd;
+}Label;
+
+#include "labelHandler.c"
 
 
 
 /* Line 189 of yacc.c  */
-#line 93 "new.tab.c"
+#line 96 "new.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -135,7 +138,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 139 "new.tab.c"
+#line 142 "new.tab.c"
 
 #ifdef short
 # undef short
@@ -419,7 +422,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    24,    24,    25,    29,    32,    35,    41,    49,    58
+       0,    27,    27,    28,    32,    35,    38,    44,    52,    61
 };
 #endif
 
@@ -1320,39 +1323,39 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 24 "new.y"
+#line 27 "new.y"
     {;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 25 "new.y"
+#line 28 "new.y"
     {;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 29 "new.y"
+#line 32 "new.y"
     {
-		getlabel((data2 *)(yyvsp[(2) - (3)]), 0);
+		getlabel((Label *)(yyvsp[(2) - (3)]), 0);
 	;}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 32 "new.y"
+#line 35 "new.y"
     {
-		getlabel((data2 *)(yyvsp[(2) - (4)]), 1);
+		getlabel((Label *)(yyvsp[(2) - (4)]), 1);
 	;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 35 "new.y"
+#line 38 "new.y"
     {
 		finishlabel((yyvsp[(3) - (4)]));
 	;}
@@ -1361,10 +1364,10 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 41 "new.y"
+#line 44 "new.y"
     {
-		data2 * tmp1 = (data2 *)(yyvsp[(1) - (2)]);
-		data1 * tmp2 = (data1 *)(yyvsp[(2) - (2)]);
+		Label * tmp1 = (Label *)(yyvsp[(1) - (2)]);
+		Prop * tmp2 = (Prop *)(yyvsp[(2) - (2)]);
 		tmp2->next = tmp1->hd;
 		tmp1->hd = tmp2;
 		//printf("label property: %s %s\n",tmp2->name,tmp2->val);
@@ -1375,9 +1378,9 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 49 "new.y"
+#line 52 "new.y"
     {
-	data2 * tmp = (data2 *)malloc(sizeof(data2));
+	Label * tmp = (Label *)malloc(sizeof(Label));
 	tmp->name = (yyvsp[(1) - (1)]); tmp->hd = NULL;
 	(yyval) = (char *)tmp;
 ;}
@@ -1386,9 +1389,9 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 58 "new.y"
+#line 61 "new.y"
     {
-		data1 * tmp = (data1 *)malloc(sizeof(data1));
+		Prop * tmp = (Prop *)malloc(sizeof(Prop));
 		//printf("%d",strlen($3));
 		//tmp->name = (char *)malloc(sizeof(char)*(1+strlen($1))); memcpy(tmp->name, $1, strlen($1)+1);
 		//tmp->val = (char *)malloc(sizeof(char)*(1+strlen($3))); memcpy(tmp->val, $3, strlen($3)+1);
@@ -1402,7 +1405,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1406 "new.tab.c"
+#line 1409 "new.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1614,7 +1617,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 69 "new.y"
+#line 72 "new.y"
 
 
 int main()  
@@ -1629,19 +1632,21 @@ int yyerror(char *s)
     return 0;  
 }
 
-void getlabel(data2* s,int flag)
+void getlabel(Label* s,int flag)
 {
 	printf("getlabel: %s %d\n" ,s->name ,flag);
-	data1* tmp = s->hd;
+	Prop* tmp = s->hd;
 	while (tmp!=NULL)
 	{
 		printf("%s=%s\n", tmp->name, tmp->val);
 		tmp = tmp->next;
 	}
 	printf("\n");
+	onGetStartingLabel(s, flag);
 }
 
 void finishlabel(char * name)
 {
 	printf("%s finished\n" ,name);
+	onGetEndingLabel(name);
 }
