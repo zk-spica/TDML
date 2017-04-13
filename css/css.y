@@ -112,8 +112,10 @@ propset:
 		tmp->name = $2;
 		tmp->val = s3;
 		Prop * s1 = (Prop *)$1;
-		tmp->next = s1->next;
+		while (s1->next!=NULL)
+			s1 = s1->next;
 		s1->next = tmp;
+		tmp->next = NULL;
 		$$ = $1;
 	}
 |	NAME VALUE {
