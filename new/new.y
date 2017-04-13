@@ -18,7 +18,7 @@ typedef struct data2
 }Label;
 
 #include "labelHandler.c"
-
+ 
 void getlabel(Label* s,int flag)
 {
 	printf("getlabel: %s %d\n" ,s->name ,flag);
