@@ -14,58 +14,104 @@ typedef struct data2
 	char *name;
 	struct data2 * next;
 }Namelist;
-
+typedef struct data3
+{
+	Namelist * list;
+	struct data3 * next;
+}Nameset;
 %}
-%token LABEL CLASS ID VALUE
+%token NAME CLASS ID VALUE
 
 %%
 
 S:
-	S comlabel {}
-|	comlabel {}
+	S block {}
+|	block {}
 ;
 
-comlabel:
-	'<' label '>' {
-		getlabel((data2 *)$2, 0);
-	}
-|	'<' label '/' '>' {
-		getlabel((data2 *)$2, 1);
-	}
-|	'<' '/' NAME '>' {
-		finishlabel($3);
+block:
+	nameset_ '{' propset '}' {
+		Nameset * s1 = (Nameset *)$1;
+		Prop * s2 = (Prop *)$3;
+		while (s1!=NULL)
+		{
+			getProp(s1->list, s2);
+			s1 = s1->next;
+		}
 	}
 ;
 
-label:
-	label property {
-		data2 * tmp1 = (data2 *)$1;
-		data1 * tmp2 = (data1 *)$2;
-		tmp2->next = tmp1->hd;
-		tmp1->hd = tmp2;
-		//printf("label property: %s %s\n",tmp2->name,tmp2->val);
-		$$ = (char *)tmp1;
+nameset_:
+	nameset_ ',' namelist_{
+		Nameset *s1 = (Nameset *)$1;
+		Prop *s2 = (Namelist *)$3;
+		Nameset * tmp = (Nameset *)malloc(sizeof(Nameset));
+		tmp->next = s1->next;
+		s1->next = tmp;
+		tmp->list = s2;
+		$$ = $1;
 	}
-|	NAME {
-	data2 * tmp = (data2 *)malloc(sizeof(data2));
-	tmp->name = $1; tmp->hd = NULL;
-	$$ = (char *)tmp;
-}
+|	namelist_ {
+		Nameset * s1 = (Nameset *)malloc(sizeof(Nameset));
+		s1->list = (Namelist *)$1;
+		s1->next = NULL;
+		$$ = (char *)s1;
+	}
 ;
 
+namelist_:
+	namelist_ threetype {
+		Namelist * s1 = (Namelist *)$1;
+		while (s1->next!=NULL) s1 = s1->next;
+		Namelist * tmp = (Namelist *)malloc(sizeof(Namelist));
+		tmp->next = NULL;
+		tmp->name = $2;
+		s1->next = tmp;
+		$$=$1;
+	}
+|	threetype {
+		Namelist * s1 = (Namelist *)malloc(sizeof(Namelist));
+		s1->name = $1;
+		s1->next = NULL;
+		$$ = (char *)s1;
+	}
+;
 
-property:
-	NAME '=' VALUE {
-		data1 * tmp = (data1 *)malloc(sizeof(data1));
-		//printf("%d",strlen($3));
-		//tmp->name = (char *)malloc(sizeof(char)*(1+strlen($1))); memcpy(tmp->name, $1, strlen($1)+1);
-		//tmp->val = (char *)malloc(sizeof(char)*(1+strlen($3))); memcpy(tmp->val, $3, strlen($3)+1);
-		//printf("SS:%s\n",tmp->name);
-		tmp->name = $1; tmp->val = $3;
+threetype:
+	NAME {$$=$1;}
+|	CLASS {$$=$1;}
+|	ID {$$=$1;}
+;
+
+propset:
+	propset NAME VALUE {
+		int n = strlen($3)-1;
+		while ($3[n-1]==' ') n--;
+		$3[n] = '\0';
+		char * s3 = $3+1;
+		while (s3[0]==' ')s3++;
+		Prop * tmp = (Prop *)malloc(sizeof(Prop));
+		tmp->name = $2;
+		tmp->val = s3;
+		Prop * s1 = (Prop *)$1;
+		tmp->next = s1->next;
+		s1->next = tmp;
+		$$ = $1;
+	}
+|	NAME VALUE {
+		int n = strlen($2)-1;
+		while ($2[n-1]==' ') n--;
+		$2[n] = '\0';
+		char * s2 = $2+1;
+		while (s2[0]==' ')s2++;
+		Prop * tmp = (Prop *)malloc(sizeof(Prop));
+		tmp->name = $1;
+		tmp->val = s2;
 		tmp->next = NULL;
 		$$ = (char *)tmp;
 	}
 ;
+
 %%
 
 int main()  
@@ -80,19 +126,19 @@ int yyerror(char *s)
     return 0;  
 }
 
-void getlabel(data2* s,int flag)
+void getProp(Namelist * s1, Prop * s2)
 {
-	printf("getlabel: %s %d\n" ,s->name ,flag);
-	data1* tmp = s->hd;
-	while (tmp!=NULL)
+	printf("getProp: ");
+	while (s1!=NULL)
 	{
-		printf("%s=%s\n", tmp->name, tmp->val);
-		tmp = tmp->next;
+		printf("%s ", s1->name);
+		s1 = s1->next;
 	}
 	printf("\n");
-}
-
-void finishlabel(char * name)
-{
-	printf("%s finished\n" ,name);
+	while (s2!=NULL)
+	{
+		printf("     %s %s\n", s2->name, s2->val);
+		s2 = s2->next;
+	}
+	printf("\n");
 }

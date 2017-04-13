@@ -15,7 +15,7 @@ extern char * yylval;
 
 [a-zA-Z_][-a-zA-Z0-9_]* {
 	yylval = strdup(yytext);
-	return LABEL;
+	return NAME;
 }
 
 [.][a-zA-Z_][-a-zA-Z0-9_]* {
