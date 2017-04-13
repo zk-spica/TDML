@@ -7,6 +7,7 @@
 #include "main.h"
 #include "css.tab.h"
 #include <stdio.h>
+#include <string.h>
 extern char * yylval;
 %}  
 

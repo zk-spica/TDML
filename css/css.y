@@ -19,6 +19,24 @@ typedef struct data3
 	Namelist * list;
 	struct data3 * next;
 }Nameset;
+
+void getProp(Namelist * s1, Prop * s2)
+{
+	printf("getProp: ");
+	while (s1!=NULL)
+	{
+		printf("%s ", s1->name);
+		s1 = s1->next;
+	}
+	printf("\n");
+	while (s2!=NULL)
+	{
+		printf("     %s %s\n", s2->name, s2->val);
+		s2 = s2->next;
+	}
+	printf("\n");
+}
+
 %}
 %token NAME CLASS ID VALUE
 
@@ -44,7 +62,7 @@ block:
 nameset_:
 	nameset_ ',' namelist_{
 		Nameset *s1 = (Nameset *)$1;
-		Prop *s2 = (Namelist *)$3;
+		Namelist *s2 = (Namelist *)$3;
 		Nameset * tmp = (Nameset *)malloc(sizeof(Nameset));
 		tmp->next = s1->next;
 		s1->next = tmp;
@@ -124,21 +142,4 @@ int yyerror(char *s)
 {  
     printf("error: %s\n",s);  
     return 0;  
-}
-
-void getProp(Namelist * s1, Prop * s2)
-{
-	printf("getProp: ");
-	while (s1!=NULL)
-	{
-		printf("%s ", s1->name);
-		s1 = s1->next;
-	}
-	printf("\n");
-	while (s2!=NULL)
-	{
-		printf("     %s %s\n", s2->name, s2->val);
-		s2 = s2->next;
-	}
-	printf("\n");
 }
