@@ -15,7 +15,10 @@ typedef struct data2
 {
 	char * name;
 	Prop * hd;
+	int childCount;
 }Label;
+
+FILE *ofp;
 
 #include "labelHandler.c"
  
@@ -92,8 +95,18 @@ property:
 %%
 
 int main()  
-{  
-    yyparse();  
+{
+	ofp = fopen("tmp", "w");
+	
+	printf("in main\n");
+	
+	labelStack[0] = (Label *)malloc(sizeof(Label));
+	labelStack[0]->childCount = 0;
+	
+	printf("alive\n");
+	
+    yyparse();
+
     return 0;  
 }  
   

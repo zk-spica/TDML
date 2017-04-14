@@ -6,6 +6,7 @@
 extern char * yylval;
 %}  
 
+%option noyywrap
 
 %% 
  
@@ -27,8 +28,3 @@ extern char * yylval;
 }
 
 %%  
-
-int yywrap()
-{
-	return 0;
-}

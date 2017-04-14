@@ -1,0 +1,6 @@
+<tdml>
+	<cuboid type="wire" color="rgb(1,0,1)" x-length="7" y-length="5" z-length="5">
+		<cuboid x-offset="-20%" x-length="2" y-length="2" z-length="2" color="rgb(0,1,0)"></cuboid>
+		<sphere x-offset="1.5" radius="2" type="wire"></sphere>
+	</cuboid>
+</tdml>
