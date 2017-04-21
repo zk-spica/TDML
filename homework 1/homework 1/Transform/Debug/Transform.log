@@ -1,4 +1,4 @@
-﻿生成启动时间为 4/14/2017 14:20:48。
+﻿生成启动时间为 4/17/2017 16:45:23。
      1>项目“M:\Document\编译技术\TDML\homework 1\homework 1\Transform\Transform.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          D:\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"M:\Document\编译技术\TDML\homework 1\homework 1\..\include" /I"M:\Document\编译技术\TDML\homework 1\homework 1\..\include\GL" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -10,4 +10,4 @@
 
 生成成功。
 
-已用时间 00:00:01.02
+已用时间 00:00:01.66

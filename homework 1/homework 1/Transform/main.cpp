@@ -21,12 +21,55 @@
 
 using namespace std;
 
-GLuint tex[3];
-
 int windowWidth = 1024, windowHeight = 768;
+int beginX, beginY, dx, dy;
+float rotateX, rotateY;
 
-GLuint program = 0;
-GLint uniformCenter = -1;
+struct Vector3f
+{
+    float x;
+    float y;
+    float z;
+
+    Vector3f() {}
+
+    Vector3f(float _x, float _y, float _z)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+    }
+   
+	Vector3f Cross(const Vector3f& v) const
+	{
+		return Vector3f(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
+	}
+
+	Vector3f& Normalize()
+	{
+		float module = sqrt(x*x+y*y+z*z);
+		x /= module;
+		y /= module;
+		z /= module;
+	}
+
+	void Rotate(float Angle, const Vector3f& Axis)
+	{
+
+	}
+
+    void Print() const
+    {
+        printf("(%.02f, %.02f, %.02f)", x, y, z);
+    }
+};
+
+struct Camera
+{
+	bool enabled=false;
+	Vector3f position, lookAt, normal;
+	
+} camera;
 
 class Property
 {
@@ -37,7 +80,8 @@ public:
 		x_length, y_length, z_length,
 		color,
 		radius,
-		type
+		type,
+		x_look_at, y_look_at, z_look_at
 	};
 
 	Property(int propertyNumber)
@@ -59,6 +103,7 @@ public:
 		tdml,
 		head,
 		body,
+		camera,
 		stylesheet,
 		cuboid,
 		sphere
@@ -87,6 +132,7 @@ struct DOMNodeStack
 }
 nodeStack[100000];
 
+
 int nNodeStack;
 
 void checkGL()
@@ -96,12 +142,11 @@ void checkGL()
 	assert(error == GL_NO_ERROR);
 }
 
-
 void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 {
 	float r=1, g=1, b=1,
 	      x_offset=0, y_offset=0, z_offset=0,
-          x_length=0, y_length=0, z_length=0,
+	      x_length=0, y_length=0, z_length=0,
 	      radius=0;
 	char type='s';
 
@@ -161,6 +206,8 @@ void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 		}
 	}
 
+	printf("tagname=%d\n", currentNode->tagName);
+
 	if (currentNode->tagName == DOMNode::body)
 	{
 		currentNode->x_base = parentNode->x_base;
@@ -173,6 +220,10 @@ void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 	else
 	if (currentNode->tagName == DOMNode::cuboid)
 	{
+		printf("get cuboid\n");
+
+		printf("length=%f %f %f\n", x_length, y_length, z_length);
+
 		currentNode->x_length = x_length;
 		currentNode->y_length = y_length;
 		currentNode->z_length = z_length;
@@ -182,7 +233,7 @@ void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 		
 		glLoadIdentity();
 	
-		gluLookAt(0, -11, 5, 0, 0, 0, 0, 0, 1);
+		gluLookAt(camera.position.x+rotateX, camera.position.y+rotateY, camera.position.z, camera.lookAt.x, camera.lookAt.y, camera.lookAt.z, 0, 0, 1);
 	
 		glScalef(x_length, y_length, z_length);
 		glTranslatef(currentNode->x_base, currentNode->y_base, currentNode->z_base);
@@ -231,9 +282,12 @@ void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 		currentNode->z_base = parentNode->z_base + z_offset;
 		glLoadIdentity();
 	
-		gluLookAt(0, -11, 5, 0, 0, 0, 0, 0, 1);
+		gluLookAt(camera.position.x+rotateX, camera.position.y+rotateY, camera.position.z, camera.lookAt.x, camera.lookAt.y, camera.lookAt.z, 0, 0, 1);
 	
 		glTranslatef(currentNode->x_base, currentNode->y_base, currentNode->z_base);
+
+
+		printf("sphere translate %f %f %f\n",currentNode->x_base, currentNode->y_base, currentNode->z_base);
 
 		GLfloat light_position[] = {1.5f, -1.0f, 2.0f, 0.0f};
 		GLfloat light_ambient[]  = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -303,13 +357,97 @@ void display()
 	glutPostRedisplay();
 }
 
-
 void buildTree();
+
 void reshape(int width, int height)
 {
 	windowWidth = width;
 	windowHeight = height;
 	glViewport(0, 0, width, height);
+}
+
+void prescanTree(DOMNode *currentNode, DOMNode *parentNode)
+{
+	float x_offset=0, y_offset=0, z_offset=0,
+	      x_look_at=0, y_look_at=0, z_look_at=0;
+
+	for (auto property=currentNode->property.begin(); property!=currentNode->property.end(); property++)
+	{
+		if ((*property)->name == Property::x_offset)
+		{
+			if ((*property)->valueForm == 0) x_offset = *(float*)(*property)->value;
+			else x_offset = parentNode->x_length * (*(float*)(*property)->value)/100;
+		}
+		else
+		if ((*property)->name == Property::y_offset)
+		{
+			if ((*property)->valueForm == 0) y_offset = *(float*)(*property)->value;
+			else y_offset = parentNode->y_length * (*(float*)(*property)->value)/100;
+		}
+		else
+		if ((*property)->name == Property::z_offset)
+		{
+			if ((*property)->valueForm == 0) z_offset = *(float*)(*property)->value;
+			else z_offset = parentNode->z_length * (*(float*)(*property)->value)/100;
+		}
+		else
+		if ((*property)->name == Property::x_look_at)
+		{
+			if ((*property)->valueForm == 0) x_look_at = *(float*)(*property)->value;
+			else x_look_at = parentNode->x_length * (*(float*)(*property)->value)/100;
+		}
+		else
+		if ((*property)->name == Property::y_look_at)
+		{
+			if ((*property)->valueForm == 0) y_look_at = *(float*)(*property)->value;
+			else y_look_at = parentNode->y_length * (*(float*)(*property)->value)/100;
+		}
+		else
+		if ((*property)->name == Property::z_look_at)
+		{
+			if ((*property)->valueForm == 0) z_look_at = *(float*)(*property)->value;
+			else z_look_at = parentNode->z_length * (*(float*)(*property)->value)/100;
+		}
+	}
+
+	if (currentNode->tagName == DOMNode::camera)
+	{
+		camera.enabled = true;
+		camera.position.x = x_offset;
+		camera.position.y = y_offset;
+		camera.position.z = z_offset;
+		camera.lookAt.x = x_look_at;
+		camera.lookAt.y = y_look_at;
+		camera.lookAt.z = z_look_at;
+	}
+
+	for (DOMNode *child=currentNode->firstChild; child!=NULL; child=child->nextSibling)
+	{
+		prescanTree(child, currentNode);
+	}
+}
+void mouseClick(int button, int state, int x, int y)
+{
+	if (state == GLUT_DOWN)
+	{
+		beginX = x;
+		beginY = y;
+	}
+	else
+	if (state == GLUT_UP)
+	{
+		rotateX += dx;
+		rotateY += dy;
+		dx = dy = 0;
+	}
+	glutPostRedisplay();
+}
+
+void mouseDrag(int x, int y)
+{
+	dx = x-beginX;
+	dy = y-beginY;
+	glutPostRedisplay();
 }
 
 int main(int argc, char *argv[])
@@ -325,9 +463,24 @@ int main(int argc, char *argv[])
 
 	buildTree();
 
+	prescanTree(domRoot, nodeStack[0].node);
+	camera.normal = {0, 1, 0};
+
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 
+	if (camera.enabled)
+	{
+
+	}
+	else
+	{
+		camera.position = {0, 11, 5};
+		camera.lookAt = {0, 0, 0};
+	}
+
+	camera.position.y *= -1;
+	
 	glutMainLoop();
 
 	return 0;
@@ -345,7 +498,51 @@ void buildTree()
 	nodeStack[nNodeStack].lastChild = NULL;
 	nodeStack[nNodeStack-1].node->firstChild = nodeStack[nNodeStack].node;
 	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
-	nodeStack[++nNodeStack].node = new DOMNode(4);
+	nodeStack[++nNodeStack].node = new DOMNode(1);
+	nodeStack[nNodeStack].lastChild = NULL;
+	nodeStack[nNodeStack-1].node->firstChild = nodeStack[nNodeStack].node;
+	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
+	nodeStack[++nNodeStack].node = new DOMNode(3);
+	nodeStack[nNodeStack].lastChild = NULL;
+	property = new Property(11);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 0;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	property = new Property(10);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 0;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	property = new Property(9);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 0;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	property = new Property(2);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 0;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	property = new Property(1);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 11;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	property = new Property(0);
+	property->valueForm = 0;
+	property->value = malloc(sizeof(float));
+	*(float*)property->value = 10;
+	nodeStack[nNodeStack].node->property.push_back(property);
+	nodeStack[nNodeStack-1].node->firstChild = nodeStack[nNodeStack].node;
+	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
+	nNodeStack--;
+	nNodeStack--;
+	nodeStack[++nNodeStack].node = new DOMNode(2);
+	nodeStack[nNodeStack].lastChild = NULL;
+	nodeStack[nNodeStack-1].lastChild->nextSibling = nodeStack[nNodeStack].node;
+	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
+	nodeStack[++nNodeStack].node = new DOMNode(5);
 	nodeStack[nNodeStack].lastChild = NULL;
 	property = new Property(5);
 	property->valueForm = 0;
@@ -365,9 +562,9 @@ void buildTree()
 	property = new Property(6);
 	property->valueForm = 0;
 	property->value = malloc(sizeof(float)*3);
-	*(float*)property->value = 1.000000;
-	*((float*)property->value+1) = 0.000000;
-	*((float*)property->value+2) = 1.000000;
+	*(float*)property->value = 0.000000;
+	*((float*)property->value+1) = 1.000000;
+	*((float*)property->value+2) = 0.000000;
 	nodeStack[nNodeStack].node->property.push_back(property);
 	property = new Property(8);
 	property->valueForm = 0;
@@ -376,7 +573,7 @@ void buildTree()
 	nodeStack[nNodeStack].node->property.push_back(property);
 	nodeStack[nNodeStack-1].node->firstChild = nodeStack[nNodeStack].node;
 	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
-	nodeStack[++nNodeStack].node = new DOMNode(4);
+	nodeStack[++nNodeStack].node = new DOMNode(5);
 	nodeStack[nNodeStack].lastChild = NULL;
 	property = new Property(6);
 	property->valueForm = 0;
@@ -408,7 +605,7 @@ void buildTree()
 	nodeStack[nNodeStack-1].node->firstChild = nodeStack[nNodeStack].node;
 	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
 	nNodeStack--;
-	nodeStack[++nNodeStack].node = new DOMNode(5);
+	nodeStack[++nNodeStack].node = new DOMNode(6);
 	nodeStack[nNodeStack].lastChild = NULL;
 	property = new Property(8);
 	property->valueForm = 0;
@@ -427,6 +624,7 @@ void buildTree()
 	nodeStack[nNodeStack].node->property.push_back(property);
 	nodeStack[nNodeStack-1].lastChild->nextSibling = nodeStack[nNodeStack].node;
 	nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;
+	nNodeStack--;
 	nNodeStack--;
 	nNodeStack--;
 	nNodeStack--;

@@ -9,12 +9,13 @@ extern FILE *ofp;
 
 int yyerror(char*);
 
-#define NTAGNAME 6
+#define NTAGNAME 7
 char *tagName[NTAGNAME] =
 {
 	"tdml",
 	"head",
 	"body",
+	"camera",
 	"stylesheet",
 	"cuboid",
 	"sphere"
@@ -25,20 +26,22 @@ enum TagName
 	tdml,
 	head,
 	body,
+	camera,
 	stylesheet,
 	cuboid,
 	sphere,
 	undefined_tag
 };
 
-#define NPROPERTYNAME 10
+#define NPROPERTYNAME 13
 char *propertyName[NPROPERTYNAME] =
 {
 	"x-offset", "y-offset", "z-offset",
 	"x-length", "y-length", "z-length",
 	"color",
 	"radius",
-	"type"
+	"type",
+	"x-look-at", "y-look-at", "z-look-at"
 };
 
 enum PropertyName
@@ -48,6 +51,7 @@ enum PropertyName
 	color,
 	radius,
 	type,
+	x_look_at, y_look_at, z_look_at,
 	undefined_property
 };
 	
@@ -79,7 +83,7 @@ void createPropertyValueField(enum TagName tagName, enum PropertyName propertyNa
 	
 	
 	
-	if (propertyName==x_offset || propertyName==y_offset || propertyName==z_offset || propertyName==x_length || propertyName==y_length || propertyName==z_length)
+	if (propertyName==x_offset || propertyName==y_offset || propertyName==z_offset || propertyName==x_length || propertyName==y_length || propertyName==z_length || propertyName==x_look_at || propertyName==y_look_at || propertyName==z_look_at)
 	{
 		if (propertyValue[strlen(propertyValue)-1] != '%')
 		{
@@ -140,6 +144,11 @@ void onGetEndingLabel(char *name)
 	nLabelStack--;
 }
 
+char* tagNameString(int x)
+{
+	return tagName[x];
+}
+
 void onGetStartingLabel(Label *label,int isSingle)
 {
 	enum TagName tagName;
@@ -150,6 +159,9 @@ void onGetStartingLabel(Label *label,int isSingle)
 	++labelCount;
 	tagName = getTagName(label->name);
 	if (tagName == undefined_tag) printf("unknown tag name: %s\n", label->name);
+	
+	printf("new Node no=%d  name=%s\n", tagName, tagNameString(tagName));
+	
 	fprintf(ofp, "nodeStack[++nNodeStack].node = new DOMNode(%d);\n", (int)tagName);
 	if (labelCount == 1)
 	{
@@ -175,6 +187,9 @@ void onGetStartingLabel(Label *label,int isSingle)
 		fprintf(ofp, "nodeStack[nNodeStack-1].lastChild->nextSibling = nodeStack[nNodeStack].node;\n");
 		fprintf(ofp, "nodeStack[nNodeStack-1].lastChild = nodeStack[nNodeStack].node;\n");
 	}
+	
+	printf("parse properties over\n");
+	
 	labelStack[nLabelStack-1]->childCount++;
 	if (isSingle) onGetEndingLabel(label->name);
 }
