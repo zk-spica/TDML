@@ -71,9 +71,8 @@ struct Camera
 	
 } camera;
 
-class Property
+struct Property
 {
-public:
 	enum Name
 	{
 		x_offset, y_offset, z_offset,
@@ -81,7 +80,7 @@ public:
 		color,
 		radius,
 		type,
-		x_look_at, y_look_at, z_look_at
+		look_at
 	};
 
 	Property(int propertyNumber)
@@ -95,9 +94,8 @@ public:
 	void *value;
 };
 
-class DOMNode
+struct DOMNode
 {
-public:
 	enum TagName
 	{
 		tdml,
@@ -152,57 +150,45 @@ void drawDOMTree(DOMNode *currentNode, DOMNode *parentNode)
 
 	for (auto property=currentNode->property.begin(); property!=currentNode->property.end(); property++)
 	{
-		if ((*property)->name == Property::x_offset)
+		switch ((*property)->name)
 		{
-			if ((*property)->valueForm == 0) x_offset = *(float*)(*property)->value;
-			else x_offset = parentNode->x_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::y_offset)
-		{
-			if ((*property)->valueForm == 0) y_offset = *(float*)(*property)->value;
-			else y_offset = parentNode->y_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::z_offset)
-		{
-			if ((*property)->valueForm == 0) z_offset = *(float*)(*property)->value;
-			else z_offset = parentNode->z_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::x_length)
-		{
-			if ((*property)->valueForm == 0) x_length = *(float*)(*property)->value;
-			else x_length = parentNode->x_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::y_length)
-		{
-			if ((*property)->valueForm == 0) y_length = *(float*)(*property)->value;
-			else y_length = parentNode->y_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::z_length)
-		{
-			if ((*property)->valueForm == 0) z_length = *(float*)(*property)->value;
-			else z_length = parentNode->z_length * (*(float*)(*property)->value)/100;
-		}
-		else
-		if ((*property)->name == Property::radius)
-		{
-			radius = *(float*)(*property)->value;
-		}
-		else
-		if ((*property)->name == Property::color)
-		{
-			r = *(float*)(*property)->value;
-			g = *((float*)(*property)->value+1);
-			b = *((float*)(*property)->value+2);
-		}
-		else
-		if ((*property)->name == Property::type)
-		{
-			type = *(char*)(*property)->value;
+			case Property::x_offset:
+				if ((*property)->valueForm == 0) x_offset = *(float*)(*property)->value;
+				else x_offset = parentNode->x_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::y_offset:
+				if ((*property)->valueForm == 0) y_offset = *(float*)(*property)->value;
+				else y_offset = parentNode->y_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::z_offset:
+				if ((*property)->valueForm == 0) z_offset = *(float*)(*property)->value;
+				else z_offset = parentNode->z_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::x_length:
+				if ((*property)->valueForm == 0) x_length = *(float*)(*property)->value;
+				else x_length = parentNode->x_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::y_length:
+				if ((*property)->valueForm == 0) y_length = *(float*)(*property)->value;
+				else y_length = parentNode->y_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::z_length:
+				if ((*property)->valueForm == 0) z_length = *(float*)(*property)->value;
+				else z_length = parentNode->z_length * (*(float*)(*property)->value)/100;
+				break;
+			case Property::radius:
+				radius = *(float*)(*property)->value;
+				break;
+			case Property::color:
+				r = *(float*)(*property)->value;
+				g = *((float*)(*property)->value+1);
+				b = *((float*)(*property)->value+2);
+				break;
+			case Property::type:
+				type = *(char*)(*property)->value;
+				break;
+			case Property::look_at:
+				
 		}
 	}
 
@@ -366,6 +352,7 @@ void reshape(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+/*
 void prescanTree(DOMNode *currentNode, DOMNode *parentNode)
 {
 	float x_offset=0, y_offset=0, z_offset=0,
@@ -426,6 +413,8 @@ void prescanTree(DOMNode *currentNode, DOMNode *parentNode)
 		prescanTree(child, currentNode);
 	}
 }
+*/
+
 void mouseClick(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN)
@@ -463,7 +452,7 @@ int main(int argc, char *argv[])
 
 	buildTree();
 
-	prescanTree(domRoot, nodeStack[0].node);
+//	prescanTree(domRoot, nodeStack[0].node);
 	camera.normal = {0, 1, 0};
 
 	glutDisplayFunc(display);

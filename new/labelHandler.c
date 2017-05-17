@@ -33,7 +33,7 @@ enum TagName
 	undefined_tag
 };
 
-#define NPROPERTYNAME 13
+#define NPROPERTYNAME 10
 char *propertyName[NPROPERTYNAME] =
 {
 	"x-offset", "y-offset", "z-offset",
@@ -41,7 +41,7 @@ char *propertyName[NPROPERTYNAME] =
 	"color",
 	"radius",
 	"type",
-	"x-look-at", "y-look-at", "z-look-at"
+	"look-at"
 };
 
 enum PropertyName
@@ -51,7 +51,7 @@ enum PropertyName
 	color,
 	radius,
 	type,
-	x_look_at, y_look_at, z_look_at,
+	look_at,
 	undefined_property
 };
 	
@@ -82,54 +82,52 @@ void createPropertyValueField(enum TagName tagName, enum PropertyName propertyNa
 	printf("createProperty #%s#\n", propertyValue);
 	
 	
-	
-	if (propertyName==x_offset || propertyName==y_offset || propertyName==z_offset || propertyName==x_length || propertyName==y_length || propertyName==z_length || propertyName==x_look_at || propertyName==y_look_at || propertyName==z_look_at)
+	switch (propertyName)
 	{
-		if (propertyValue[strlen(propertyValue)-1] != '%')
-		{
+		case x_offset:
+		case y_offset:
+		case z_offset:
+		case x_length:
+		case y_length:
+		case z_length:
+			if (propertyValue[strlen(propertyValue)-1] != '%')
+			{
+				fprintf(ofp, "property->valueForm = 0;\n");
+				fprintf(ofp, "property->value = malloc(sizeof(float));\n");
+				fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
+			}
+			else
+			{
+				fprintf(ofp, "property->valueForm = 1;\n");
+				fprintf(ofp, "property->value = malloc(sizeof(float));\n");
+				propertyValue[strlen(propertyValue)-1] = '\0';
+				fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
+				propertyValue[strlen(propertyValue)-1] = '%';
+			}
+			break;
+		case radius:
 			fprintf(ofp, "property->valueForm = 0;\n");
 			fprintf(ofp, "property->value = malloc(sizeof(float));\n");
 			fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
-		}
-		else
-		{
-			fprintf(ofp, "property->valueForm = 1;\n");
-			fprintf(ofp, "property->value = malloc(sizeof(float));\n");
-			propertyValue[strlen(propertyValue)-1] = '\0';
-			fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
-			propertyValue[strlen(propertyValue)-1] = '%';
-		}
-	}
-	else
-	if (propertyName == radius)
-	{
-		fprintf(ofp, "property->valueForm = 0;\n");
-		fprintf(ofp, "property->value = malloc(sizeof(float));\n");
-		fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
-	}
-	if (propertyName == color)
-	{
-		fprintf(ofp, "property->valueForm = 0;\n");
-		fprintf(ofp, "property->value = malloc(sizeof(float)*3);\n");
-		float r, g, b;
-		sscanf(propertyValue, "rgb(%f,%f,%f)", &r, &g, &b);
-		fprintf(ofp, "*(float*)property->value = %f;\n", r);
-		fprintf(ofp, "*((float*)property->value+1) = %f;\n", g);
-		fprintf(ofp, "*((float*)property->value+2) = %f;\n", b);
-	}
-	else
-	if (propertyName == type)
-	{
-		fprintf(ofp, "property->valueForm = 0;\n");
-		fprintf(ofp, "property->value = malloc(sizeof(char));\n");
-		char tp = '?';
-		
-		printf("intype %s\n", propertyValue);
-		
-		if (!strcmp(propertyValue,"solid")) tp = 's';
-		else
-		if (!strcmp(propertyValue,"wire")) tp = 'w';
-		fprintf(ofp, "*(char*)property->value = '%c';\n", tp);
+			break;
+		case color:
+			fprintf(ofp, "property->valueForm = 0;\n");
+			fprintf(ofp, "property->value = malloc(sizeof(float)*3);\n");
+			float r, g, b;
+			sscanf(propertyValue, "rgb(%f,%f,%f)", &r, &g, &b);
+			fprintf(ofp, "*(float*)property->value = %f;\n", r);
+			fprintf(ofp, "*((float*)property->value+1) = %f;\n", g);
+			fprintf(ofp, "*((float*)property->value+2) = %f;\n", b);
+			break;
+		case type:
+			fprintf(ofp, "property->valueForm = 0;\n");
+			fprintf(ofp, "property->value = malloc(sizeof(char));\n");
+			char tp = '?';
+			if (!strcmp(propertyValue,"solid")) tp = 's';
+			else
+			if (!strcmp(propertyValue,"wire")) tp = 'w';
+			fprintf(ofp, "*(char*)property->value = '%c';\n", tp);
+			break;
 	}
 }
 
