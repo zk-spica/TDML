@@ -1,0 +1,6 @@
+<tdml>
+	<cuboid tdmlclass="heihei" type="wire" z-rotation="45deg" x-length="7" y-length="5" z-length="5">
+		<cuboid texture="sun.bmp" z-rotation="-0.785" z-offset="1" y-offset="5" x-offset="-20%" x-length="2" y-length="2" z-length="2" color="rgb(0,1,0)"></cuboid>
+		<sphere tdmlid="ball" x-offset="1.5" radius="2" ></sphere>
+	</cuboid>
+</tdml>

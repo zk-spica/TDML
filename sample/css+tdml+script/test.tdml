@@ -1,0 +1,6 @@
+<tdml>
+	<cuboid tdmlid="lu" x-offset="-2" z-offset="2" x-length="2" y-length="2" z-length="2"/>
+	<cuboid tdmlid="ru" x-offset="2" z-offset="2" x-length="2" y-length="2" z-length="2"/>
+	<cuboid tdmlid="ld" x-offset="-2" z-offset="-2" x-length="2" y-length="2" z-length="2"/>
+	<cuboid tdmlid="rd" x-offset="2" z-offset="-2" x-length="2" y-length="2" z-length="2"/>
+</tdml>

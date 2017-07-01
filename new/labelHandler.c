@@ -33,25 +33,35 @@ enum TagName
 	undefined_tag
 };
 
-#define NPROPERTYNAME 10
+#define NPROPERTYNAME 22
 char *propertyName[NPROPERTYNAME] =
 {
+	"tdmlclass",
+	"tdmlid",
 	"x-offset", "y-offset", "z-offset",
 	"x-length", "y-length", "z-length",
+	"x-rotation", "y-rotation", "z-rotation",
 	"color",
 	"radius",
 	"type",
-	"look-at"
+	"look-at",
+	"texture",
+	"texture-x-positive", "texture-x-negative", "texture-y-positive", "texture-y-negative", "texture-z-positive", "texture-z-negative"
 };
 
 enum PropertyName
 {
+	tdmlclass,
+	tdmlid,
 	x_offset, y_offset, z_offset,
 	x_length, y_length, z_length,
+	x_rotation, y_rotation, z_rotation,
 	color,
 	radius,
 	type,
 	look_at,
+	texture,
+	texture_x_positive, texture_x_negative, texture_y_positive, texture_y_negative, texture_z_positive, texture_z_negative,
 	undefined_property
 };
 	
@@ -70,6 +80,8 @@ int getPropertyNumber(char *name)
 	if (!strcmp(propertyName[i],name)) return i;
 	return -1;
 }
+
+
 
 void createPropertyValueField(enum TagName tagName, enum PropertyName propertyName, char *propertyValue)
 {
@@ -127,6 +139,47 @@ void createPropertyValueField(enum TagName tagName, enum PropertyName propertyNa
 			else
 			if (!strcmp(propertyValue,"wire")) tp = 'w';
 			fprintf(ofp, "*(char*)property->value = '%c';\n", tp);
+			break;
+		case tdmlclass:
+		case tdmlid:
+		case texture:
+		case texture_x_positive:
+		case texture_x_negative:
+		case texture_y_positive:
+		case texture_y_negative:
+		case texture_z_positive:
+		case texture_z_negative:
+			fprintf(ofp, "property->valueForm = 0;\n");
+			fprintf(ofp, "property->value = malloc(sizeof(char*));\n");
+			fprintf(ofp, "*((char**)(property->value)) = \"%s\";\n", propertyValue);
+			break;
+		case x_rotation:
+		case y_rotation:
+		case z_rotation:
+			1+1==2;
+			int len = strlen(propertyValue);
+			if (!strcmp(propertyValue+len-3,"deg"))
+			{
+				fprintf(ofp, "property->valueForm = 0;\n");
+				fprintf(ofp, "property->value = malloc(sizeof(float));\n");
+				propertyValue[len-3] = '\0';
+				fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
+			}
+			else
+			{
+				fprintf(ofp, "property->valueForm = 1;\n");
+				fprintf(ofp, "property->value = malloc(sizeof(float));\n");
+				fprintf(ofp, "*(float*)property->value = %s;\n", propertyValue);
+			}
+			break;
+		case look_at:
+			fprintf(ofp, "property->valueForm = 0;\n");
+			fprintf(ofp, "property->value = malloc(sizeof(float)*3);\n");
+			float x, y, z;
+			sscanf(propertyValue, "(%f,%f,%f)", &x, &y, &z);
+			fprintf(ofp, "*(float*)property->value = %f\n", x);
+			fprintf(ofp, "*((float*)property->value+1) = %f\n", y);
+			fprintf(ofp, "*((float*)property->value+1) = %f\n", z);
 			break;
 	}
 }

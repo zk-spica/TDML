@@ -1,0 +1,15 @@
+Type__ cal(Type__ a123,Type__ b123b,Type__ c) {
+	Type__ a = new Object();
+	a[1] = 10;
+	a[a[1]] = a[1];
+	Type__ b=new Object();
+	b[1]=new Object();
+	b[1].c=new Object();
+	b[1].c.d=a123++;
+	return a[10]+b[1].c.d;
+}
+
+Type__ mainScript() {
+	return cal(1, 2, 5);
+}
+

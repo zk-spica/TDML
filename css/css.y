@@ -20,6 +20,10 @@ typedef struct data3
 	struct data3 * next;
 }Nameset;
 
+FILE * ofp;
+
+#include "cssHandler.c"
+
 void getProp(Namelist * s1, Prop * s2)
 {
 	printf("getProp: ");
@@ -49,13 +53,15 @@ S:
 
 block:
 	nameset_ '{' propset '}' {
-		Nameset * s1 = (Nameset *)$1;
+		Nameset * s1 = (Nameset *)$1 ,* ss;
 		Prop * s2 = (Prop *)$3;
+		ss = s1;
 		while (s1!=NULL)
 		{
 			getProp(s1->list, s2);
 			s1 = s1->next;
 		}
+		onGetCSS(ss, s2);
 	}
 ;
 
@@ -135,7 +141,8 @@ propset:
 %%
 
 int main()  
-{  
+{
+	ofp = fopen("tmpCSS", "w");
     yyparse();  
     return 0;  
 }  

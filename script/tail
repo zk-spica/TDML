@@ -1,0 +1,7 @@
+Script__ A;
+int main()
+{
+	cout<<(A.mainScript()).val1<<endl;
+	return 0;
+}
+

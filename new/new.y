@@ -94,8 +94,11 @@ property:
 ;
 %%
 
-int main()  
+int main(int argc, char *argv[])  
 {
+	
+	printf("argv1=%s\n", argv[1]);
+	
 	ofp = fopen("tmp", "w");
 	
 	printf("in main\n");

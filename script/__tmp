@@ -1,0 +1,37 @@
+
+Type__ cnt = 0;
+Type__ x, rot, off, len, tex;
+Type__ onRedisplay()
+{
+	++cnt;
+	
+	if ((cnt >= 50).getbool() ) cnt = 0;
+	
+	printf("cnt = %d\n", cnt);
+	
+	x = getElementById("lu");
+	rot = cnt/50.0*6.28;
+	modify(x, "z-rotation", tostring(rot));
+	
+	x = getElementById("ru");
+	off = cnt/20+2;
+	modify(x, "x-offset", tostring(off));
+	
+	x = getElementById("ld");
+	len = cnt/20+2;
+	modify(x, "x-length", tostring(len));
+	
+	x = getElementById("rd");
+	if ( (cnt > 25).getbool() ) tex = "sun.bmp";
+	else tex = "earth.bmp";
+	modify(x, "texture", tex);
+	
+	return 0;
+}
+
+Type__ mainScript() {
+
+	
+	return 0;
+}
+

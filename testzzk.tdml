@@ -1,0 +1,15 @@
+<tdml>
+	<head>
+		<camera x-offset="10" y-offset="11" z-offset="0" x-look-at="0" y-look-at="0" z-look-at="0"/>
+	</head>
+	
+	<body>
+		<cuboid type="wire" color="rgb(0,1,0)" x-length="7" y-length="5" z-length="5" x-offset="7">
+			<cuboid x-offset="-20%" x-length="2" y-length="2" z-length="2" color="rgb(0,1,0)"/>
+			<sphere x-offset="1.5" radius="2" type="wire"></sphere>
+		</cuboid>
+		<cuboid x-length="2" y-length="2" z-length="2" texture="sun.bmp" x-offset="-2">
+			
+		</cuboid>
+	</body>
+</tdml>

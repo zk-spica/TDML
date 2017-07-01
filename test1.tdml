@@ -1,0 +1,7 @@
+<tdml>
+	<camera tdmlid="camera" x-offset="0" y-offset="-20" z-offset="0.1"/>
+	<cuboid tdmlclass="heihei" type="wire" z-rotation="45deg" x-length="7" y-length="5" z-length="5">
+		<cuboid tdmlid="id" texture="sun.bmp" z-rotation="-1.0" z-offset="1" y-offset="5" x-offset="-20%" x-length="2" y-length="2" z-length="2" color="rgb(0,1,0)"></cuboid>
+		<sphere tdmlid="ball" x-offset="1.5" radius="2" type="wire"></sphere>
+	</cuboid>
+</tdml>
